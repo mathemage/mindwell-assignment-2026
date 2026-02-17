@@ -243,6 +243,9 @@ class FinalizerAgent:
                 "citations": [],
                 "safety_outcome": safety_result.outcome.value,
                 "safety_reason": safety_result.reason,
+                "violation_type": safety_result.violation_type.value if safety_result.violation_type else None,
+                "severity": safety_result.severity,
+                "confidence": safety_result.confidence,
             }
 
         elif safety_result.outcome == SafetyOutcome.REFUSED:
@@ -257,6 +260,9 @@ class FinalizerAgent:
                 "citations": [],
                 "safety_outcome": safety_result.outcome.value,
                 "safety_reason": safety_result.reason,
+                "violation_type": safety_result.violation_type.value if safety_result.violation_type else None,
+                "severity": safety_result.severity,
+                "confidence": safety_result.confidence,
             }
 
         # OK - return draft response
@@ -265,4 +271,7 @@ class FinalizerAgent:
             "citations": draft["citations"],
             "safety_outcome": safety_result.outcome.value,
             "usage": draft.get("usage", {}),
+            "violation_type": None,
+            "severity": None,
+            "confidence": safety_result.confidence,
         }

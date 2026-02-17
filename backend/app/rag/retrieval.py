@@ -2,7 +2,7 @@
 
 from typing import Any
 
-from sqlalchemy import select, text
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
@@ -43,21 +43,22 @@ class RetrievalService:
         Returns:
             List of retrieved chunks with metadata
         """
-        logger.info("Retrieving chunks", query=query, top_k=top_k)
+        logger.info("Retrieving chunks", query_length=len(query), top_k=top_k)
 
         # Generate query embedding
         query_vector = await self.llm_provider.generate_embedding(query)
 
         # Perform vector similarity search
+        distance_expr = Embedding.vector.cosine_distance(query_vector).label("distance")
         stmt = (
             select(
                 Chunk,
                 Document,
-                Embedding.vector.cosine_distance(query_vector).label("distance"),
+                distance_expr,
             )
             .join(Embedding, Chunk.id == Embedding.chunk_id)
             .join(Document, Chunk.document_id == Document.id)
-            .order_by(text("distance"))
+            .order_by(distance_expr)
             .limit(top_k)
         )
 
