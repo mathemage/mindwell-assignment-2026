@@ -48,7 +48,7 @@ class Document(Base):
     title: Mapped[str] = mapped_column(String, index=True)
     source_type: Mapped[str] = mapped_column(String)  # markdown, pdf, etc.
     content: Mapped[str] = mapped_column(Text)
-    metadata: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+    extra_metadata: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
@@ -71,7 +71,7 @@ class Chunk(Base):
     document_id: Mapped[str] = mapped_column(String, ForeignKey("documents.id"), index=True)
     chunk_index: Mapped[int] = mapped_column(Integer)
     text: Mapped[str] = mapped_column(Text)
-    metadata: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+    chunk_metadata: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
     # Relationships
@@ -133,7 +133,7 @@ class Message(Base):
     )
     role: Mapped[str] = mapped_column(String)  # user, assistant, system
     content: Mapped[str] = mapped_column(Text)
-    metadata: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+    message_metadata: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
     # Relationships

@@ -72,7 +72,7 @@ class AgentOrchestrator:
                     self.retriever.retrieve(db, message, top_k),
                     timeout=self.timeout,
                 )
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 logger.error("Orchestrator: Retrieval timeout")
                 return {
                     "content": "I'm having trouble processing your request right now. Please try again.",
@@ -87,7 +87,7 @@ class AgentOrchestrator:
                     self.drafter.draft_response(message, retrieved_chunks),
                     timeout=self.timeout,
                 )
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 logger.error("Orchestrator: Draft generation timeout")
                 return {
                     "content": "I'm having trouble generating a response right now. Please try again.",

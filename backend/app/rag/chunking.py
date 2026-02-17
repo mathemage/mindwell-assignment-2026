@@ -29,7 +29,11 @@ class TextChunker:
         """
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
-        self.encoding = tiktoken.get_encoding("cl100k_base")
+        try:
+            self.encoding = tiktoken.get_encoding("cl100k_base")
+        except Exception:
+            # Tiktoken may fail in offline environments
+            self.encoding = None
 
     def chunk_markdown(self, text: str, metadata: dict[str, Any] | None = None) -> list[dict[str, Any]]:
         """
@@ -61,7 +65,7 @@ class TextChunker:
                 # Process previous section
                 if current_text.strip():
                     section_chunks = self._split_long_text(current_text)
-                    for idx, chunk in enumerate(section_chunks):
+                    for _idx, chunk in enumerate(section_chunks):
                         chunks.append({
                             "text": chunk,
                             "metadata": {
@@ -80,7 +84,7 @@ class TextChunker:
         # Process last section
         if current_text.strip():
             section_chunks = self._split_long_text(current_text)
-            for idx, chunk in enumerate(section_chunks):
+            for _idx, chunk in enumerate(section_chunks):
                 chunks.append({
                     "text": chunk,
                     "metadata": {

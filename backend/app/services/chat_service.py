@@ -74,7 +74,7 @@ class ChatService:
             conversation_id=conversation.id,
             role="user",
             content=redact_pii(content) if redact_pii else content,
-            metadata={"original_length": len(content)},
+            message_metadata={"original_length": len(content)},
         )
         db.add(user_message)
         db.flush()
@@ -87,7 +87,7 @@ class ChatService:
             conversation_id=conversation.id,
             role="assistant",
             content=response["content"],
-            metadata={
+            message_metadata={
                 "citations": response.get("citations", []),
                 "usage": response.get("usage", {}),
             },
@@ -166,7 +166,7 @@ class ChatService:
                 "role": msg.role,
                 "content": msg.content,
                 "created_at": msg.created_at.isoformat(),
-                "metadata": msg.metadata,
+                "metadata": msg.message_metadata,
             }
             for msg in messages
         ]

@@ -1,10 +1,9 @@
 """Safety policy definitions and rules."""
 
-from enum import Enum
-from typing import Any
+from enum import StrEnum
 
 
-class SafetyOutcome(str, Enum):
+class SafetyOutcome(StrEnum):
     """Safety check outcomes."""
 
     OK = "ok"
@@ -12,7 +11,7 @@ class SafetyOutcome(str, Enum):
     ESCALATED = "escalated"
 
 
-class ViolationType(str, Enum):
+class ViolationType(StrEnum):
     """Types of safety violations."""
 
     CRISIS = "crisis"
@@ -69,10 +68,10 @@ Please also contact your therapist or mental health provider as soon as possible
 """
 
     MEDICAL_DISCLAIMER = """
-I'm an AI assistant designed to provide general information about cognitive behavioral therapy 
-and mental wellness. I cannot diagnose medical conditions or prescribe medications. 
+I'm an AI assistant designed to provide general information about cognitive behavioral therapy
+and mental wellness. I cannot diagnose medical conditions or prescribe medications.
 
-For medical advice, diagnosis, or treatment, please consult with a qualified healthcare provider 
+For medical advice, diagnosis, or treatment, please consult with a qualified healthcare provider
 or mental health professional.
 """
 
