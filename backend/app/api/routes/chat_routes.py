@@ -64,7 +64,7 @@ async def send_chat_message(
 
     except Exception as e:
         logger.error("Chat request failed", error=str(e), exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @router.get("/conversations", response_model=list[ConversationListItem])

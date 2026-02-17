@@ -1,7 +1,7 @@
 """Tests for safety classifier."""
 
 from app.safety.classifier import SafetyClassifier
-from app.safety.policy import SafetyOutcome, SafetyPolicy, ViolationType
+from app.safety.policy import SafetyOutcome, ViolationType
 
 
 def test_crisis_detection():

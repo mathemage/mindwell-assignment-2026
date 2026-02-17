@@ -62,7 +62,7 @@ async def upload_document(
 
     except Exception as e:
         logger.error("Document upload failed", error=str(e), exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @router.get("", response_model=list[DocumentListItem])
@@ -104,7 +104,7 @@ def get_document(
         title=document.title,
         source_type=document.source_type,
         content=document.content,
-        metadata=document.metadata,
+        metadata=document.extra_metadata,
         created_at=document.created_at,
         updated_at=document.updated_at,
     )
@@ -139,4 +139,4 @@ async def reindex_document(
 
     except Exception as e:
         logger.error("Document reindex failed", error=str(e), exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e

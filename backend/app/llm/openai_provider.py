@@ -50,7 +50,7 @@ class OpenAIProvider(LLMProvider):
 
         except Exception as e:
             logger.error("Failed to generate embedding", error=str(e))
-            raise EmbeddingError(f"Failed to generate embedding: {str(e)}")
+            raise EmbeddingError(f"Failed to generate embedding: {str(e)}") from e
 
     async def chat_completion(
         self,
@@ -114,7 +114,7 @@ class OpenAIProvider(LLMProvider):
 
         except Exception as e:
             logger.error("Failed to generate chat completion", error=str(e))
-            raise LLMError(f"Failed to generate chat completion: {str(e)}")
+            raise LLMError(f"Failed to generate chat completion: {str(e)}") from e
 
 
 def get_llm_provider() -> LLMProvider:

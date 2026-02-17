@@ -1,6 +1,5 @@
 """Test configuration and fixtures."""
 
-import os
 import uuid
 from collections.abc import Generator
 
@@ -90,7 +89,7 @@ Keep track of negative thoughts and challenge them with evidence.
 
 Gradually face feared situations in a controlled way.
 """,
-        metadata={"source": "test"},
+        extra_metadata={"source": "test"},
     )
     test_db.add(doc)
     test_db.commit()

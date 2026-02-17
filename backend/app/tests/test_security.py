@@ -42,9 +42,10 @@ def test_phone_redaction():
 
 def test_multiple_pii_redaction():
     """Test multiple PII types."""
-    text = "Email me at john@example.com or call 555-1234"
+    text = "Email me at john@example.com or call (555) 123-4567"
     redacted = redact_pii(text)
 
     assert "john@example.com" not in redacted
     assert "[EMAIL]" in redacted
-    assert "[PHONE]" in redacted or "555-1234" not in redacted
+    # Phone number should be redacted
+    assert "[PHONE]" in redacted or "(555) 123-4567" not in redacted

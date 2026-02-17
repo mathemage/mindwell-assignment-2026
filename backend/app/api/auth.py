@@ -59,11 +59,11 @@ def decode_access_token(token: str) -> str:
                 detail="Could not validate credentials",
             )
         return user_id
-    except JWTError:
+    except JWTError as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
-        )
+        ) from e
 
 
 async def get_current_user(

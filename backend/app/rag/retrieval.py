@@ -2,7 +2,7 @@
 
 from typing import Any
 
-from sqlalchemy import func, select, text
+from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
@@ -75,10 +75,10 @@ class RetrievalService:
                 "citation": {
                     "document_id": document.id,
                     "document_title": document.title,
-                    "section_heading": chunk.metadata.get("heading", ""),
+                    "section_heading": chunk.chunk_metadata.get("heading", ""),
                     "chunk_index": chunk.chunk_index,
                 },
-                "metadata": chunk.metadata,
+                "metadata": chunk.chunk_metadata,
             })
 
         logger.info("Retrieved chunks", result_count=len(retrieved))

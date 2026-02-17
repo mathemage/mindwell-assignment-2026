@@ -4,7 +4,6 @@ import io
 from pathlib import Path
 from typing import Any
 
-import markdown
 from pypdf import PdfReader
 from sqlalchemy.orm import Session
 
@@ -71,7 +70,7 @@ class DocumentService:
                 title=title,
                 content=content,
                 source_type=source_type,
-                metadata=metadata or {},
+                extra_metadata=metadata or {},
             )
             db.add(document)
             db.flush()
@@ -95,7 +94,7 @@ class DocumentService:
                     document_id=document.id,
                     chunk_index=idx,
                     text=chunk_data["text"],
-                    metadata=chunk_data["metadata"],
+                    chunk_metadata=chunk_data["metadata"],
                 )
                 db.add(chunk)
                 chunks.append(chunk)
@@ -123,7 +122,7 @@ class DocumentService:
         except Exception as e:
             db.rollback()
             logger.error("Failed to ingest document", error=str(e), exc_info=True)
-            raise DocumentProcessingError(f"Failed to ingest document: {str(e)}")
+            raise DocumentProcessingError(f"Failed to ingest document: {str(e)}") from e
 
     async def ingest_file(
         self,
@@ -188,7 +187,7 @@ class DocumentService:
 
         except Exception as e:
             logger.error("Failed to ingest file", error=str(e), exc_info=True)
-            raise DocumentProcessingError(f"Failed to ingest file: {str(e)}")
+            raise DocumentProcessingError(f"Failed to ingest file: {str(e)}") from e
 
     def list_documents(
         self,
@@ -271,7 +270,7 @@ class DocumentService:
                     document_id=document.id,
                     chunk_index=idx,
                     text=chunk_data["text"],
-                    metadata=chunk_data["metadata"],
+                    chunk_metadata=chunk_data["metadata"],
                 )
                 db.add(chunk)
                 chunks.append(chunk)
@@ -298,4 +297,4 @@ class DocumentService:
         except Exception as e:
             db.rollback()
             logger.error("Failed to re-index document", error=str(e), exc_info=True)
-            raise DocumentProcessingError(f"Failed to re-index document: {str(e)}")
+            raise DocumentProcessingError(f"Failed to re-index document: {str(e)}") from e
