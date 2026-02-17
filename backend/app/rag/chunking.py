@@ -35,7 +35,9 @@ class TextChunker:
             # Tiktoken may fail in offline environments
             self.encoding = None
 
-    def chunk_markdown(self, text: str, metadata: dict[str, Any] | None = None) -> list[dict[str, Any]]:
+    def chunk_markdown(
+        self, text: str, metadata: dict[str, Any] | None = None
+    ) -> list[dict[str, Any]]:
         """
         Chunk markdown text by headings.
 
@@ -50,7 +52,7 @@ class TextChunker:
         metadata = metadata or {}
 
         # Split by headings
-        sections = re.split(r'\n(#{1,6})\s+(.+)\n', text)
+        sections = re.split(r"\n(#{1,6})\s+(.+)\n", text)
 
         current_heading = ""
         current_level = 0
@@ -66,15 +68,17 @@ class TextChunker:
                 if current_text.strip():
                     section_chunks = self._split_long_text(current_text)
                     for _idx, chunk in enumerate(section_chunks):
-                        chunks.append({
-                            "text": chunk,
-                            "metadata": {
-                                **metadata,
-                                "heading": current_heading,
-                                "heading_level": current_level,
-                                "section_index": len(chunks),
-                            },
-                        })
+                        chunks.append(
+                            {
+                                "text": chunk,
+                                "metadata": {
+                                    **metadata,
+                                    "heading": current_heading,
+                                    "heading_level": current_level,
+                                    "section_index": len(chunks),
+                                },
+                            }
+                        )
 
                 # Update current heading
                 current_level = len(heading_markers)
@@ -85,15 +89,17 @@ class TextChunker:
         if current_text.strip():
             section_chunks = self._split_long_text(current_text)
             for _idx, chunk in enumerate(section_chunks):
-                chunks.append({
-                    "text": chunk,
-                    "metadata": {
-                        **metadata,
-                        "heading": current_heading,
-                        "heading_level": current_level,
-                        "section_index": len(chunks),
-                    },
-                })
+                chunks.append(
+                    {
+                        "text": chunk,
+                        "metadata": {
+                            **metadata,
+                            "heading": current_heading,
+                            "heading_level": current_level,
+                            "section_index": len(chunks),
+                        },
+                    }
+                )
 
         logger.info("Chunked markdown", total_chunks=len(chunks))
         return chunks
@@ -148,11 +154,11 @@ class TextChunker:
             # Try to break at sentence boundary
             if end < len(text):
                 # Look for sentence ending
-                sentence_ends = ['. ', '! ', '? ', '\n\n']
+                sentence_ends = [". ", "! ", "? ", "\n\n"]
                 best_end = end
 
                 for i in range(end, max(start + self.chunk_size // 2, start), -1):
-                    if any(text[i:i+2].startswith(se) for se in sentence_ends):
+                    if any(text[i : i + 2].startswith(se) for se in sentence_ends):
                         best_end = i + 1
                         break
 

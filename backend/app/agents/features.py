@@ -7,26 +7,26 @@ work together to provide safe, grounded, and helpful responses.
 
 Architecture Overview:
     The agent pipeline follows a sequential processing flow:
-    
+
     1. RetrieverAgent: Performs semantic search to find relevant context from the knowledge base
     2. DraftAgent: Generates initial responses using an LLM with retrieved context
-    3. SafetyAgent: Validates both input and output for safety violations (crisis detection, 
+    3. SafetyAgent: Validates both input and output for safety violations (crisis detection,
        medical advice, response grounding)
     4. FinalizerAgent: Makes final decisions on response delivery based on safety checks
-    
+
 Key Design Principles:
     - Privacy First: No personally identifiable information (PII) is logged or stored
     - Safety Over Performance: Conservative thresholds favor false positives to avoid missing
       critical safety issues
     - Grounded Responses: All responses must be based on retrieved context with citations
     - Separation of Concerns: Each agent has a single, well-defined responsibility
-    
+
 Usage Example:
     >>> retriever = RetrieverAgent(retrieval_service)
     >>> draft_agent = DraftAgent(llm_provider)
     >>> safety_agent = SafetyAgent(classifier, policy)
     >>> finalizer = FinalizerAgent(policy)
-    >>> 
+    >>>
     >>> # Process a user query
     >>> chunks = await retriever.retrieve(db, "What are CBT thought records?", top_k=5)
     >>> draft = await draft_agent.draft_response("What are CBT thought records?", chunks)
@@ -39,7 +39,7 @@ Dependencies:
     - app.llm.provider: Abstract LLM provider interface
     - app.rag.retrieval: Semantic search and retrieval service
     - app.safety: Safety classification and policy enforcement
-    
+
 Module Structure:
     This file is organized into four main sections:
     1. Imports and Configuration
@@ -58,7 +58,6 @@ from app.rag.retrieval import RetrievalService
 from app.safety.classifier import SafetyClassifier, SafetyResult
 from app.safety.policy import SafetyOutcome, SafetyPolicy
 
-
 # =============================================================================
 # MODULE CONFIGURATION
 # =============================================================================
@@ -74,24 +73,24 @@ logger = get_logger(__name__)
 class RetrieverAgent:
     """
     Agent responsible for semantic search and context retrieval.
-    
+
     The RetrieverAgent is the first stage in the RAG pipeline. It takes a user's query,
     converts it to an embedding vector, and performs cosine similarity search against
     the knowledge base to find the most relevant context chunks.
-    
+
     This agent uses pgvector for efficient similarity search and returns chunks with
     complete citation metadata (document ID, title, section heading, chunk index).
-    
+
     Attributes:
         retrieval_service: RetrievalService instance that handles the actual search
             operations including embedding generation and vector similarity computation.
-    
+
     Design Notes:
         - Stateless operation: Each retrieve() call is independent
         - Async implementation: Allows concurrent processing of multiple requests
         - Citation tracking: All returned chunks include full citation information
         - No caching: Fresh results on each call ensure up-to-date information
-        
+
     Example:
         >>> retriever = RetrieverAgent(retrieval_service)
         >>> chunks = await retriever.retrieve(
@@ -113,7 +112,7 @@ class RetrieverAgent:
                 an embedding provider and database connection. This service
                 handles the low-level operations of embedding generation and
                 vector similarity search.
-                
+
         Raises:
             ValueError: If retrieval_service is None or not properly initialized.
         """
@@ -127,12 +126,12 @@ class RetrieverAgent:
     ) -> list[dict[str, Any]]:
         """
         Retrieve the most relevant knowledge base chunks for a given query.
-        
+
         This method performs semantic search by:
         1. Converting the query text to an embedding vector
         2. Computing cosine similarity against all document chunks
         3. Returning the top_k most similar chunks with full citations
-        
+
         The returned chunks include both the text content and metadata needed
         for citation and context building in downstream agents.
 
@@ -159,14 +158,14 @@ class RetrieverAgent:
                     "similarity_score": float  # Cosine similarity (0.0-1.0)
                 }
             ]
-            
+
             Returns empty list if no documents are in the knowledge base or
             if the query cannot be processed.
-            
+
         Raises:
             Exception: If embedding generation fails or database query errors occur.
                 Errors are logged but not suppressed to maintain system integrity.
-                
+
         Example:
             >>> chunks = await retriever.retrieve(
             ...     db=session,
@@ -186,28 +185,28 @@ class RetrieverAgent:
 class DraftAgent:
     """
     Agent responsible for generating draft responses using a Large Language Model (LLM).
-    
+
     The DraftAgent is the second stage in the RAG pipeline. It takes the user's query
     and retrieved context chunks, constructs an appropriate prompt, and generates a
     response using the configured LLM provider.
-    
+
     Key responsibilities:
     - Build structured context from retrieved chunks
     - Create system prompts that enforce safety and grounding rules
     - Generate responses with proper citations
     - Handle empty retrieval scenarios gracefully
-    
+
     Attributes:
         llm_provider: LLMProvider instance that abstracts the underlying LLM API
             (OpenAI, Azure OpenAI, or compatible endpoints).
-    
+
     Design Notes:
         - Stateless operation: No conversation history is maintained
         - Citation extraction: All responses include references to source documents
         - Grounding enforcement: System prompt explicitly requires context-based answers
         - Temperature: Set to 0.7 for balance between creativity and consistency
         - No medical advice: System prompt explicitly prohibits diagnoses and prescriptions
-        
+
     Example:
         >>> draft_agent = DraftAgent(llm_provider)
         >>> chunks = [...]  # From RetrieverAgent
@@ -227,7 +226,7 @@ class DraftAgent:
             llm_provider: An instance of LLMProvider that handles communication
                 with the underlying language model. The provider must support
                 chat completion with messages format and return usage statistics.
-                
+
         Raises:
             ValueError: If llm_provider is None or not properly configured.
         """
@@ -240,14 +239,14 @@ class DraftAgent:
     ) -> dict[str, Any]:
         """
         Generate a draft response to the user's query based on retrieved context.
-        
+
         This method orchestrates the response generation process:
         1. Checks if context is available (returns clarification if empty)
         2. Builds a structured context string from chunks with citations
         3. Constructs a system prompt with safety and grounding rules
         4. Calls the LLM to generate a response
         5. Extracts citations from the response
-        
+
         The generated response is always grounded in the provided context and
         includes explicit citations to source documents.
 
@@ -265,17 +264,17 @@ class DraftAgent:
                 "citations": list[dict],  # List of cited sources with metadata
                 "usage": dict  # Token usage stats from LLM (if applicable)
             }
-            
+
             For empty retrieved_chunks, returns a clarification request:
             {
                 "content": "I don't have enough information...",
                 "citations": []
             }
-            
+
         Raises:
             Exception: If LLM API call fails or response parsing errors occur.
                 Errors are logged and propagated to allow proper error handling.
-                
+
         Example:
             >>> chunks = [
             ...     {
@@ -340,31 +339,31 @@ If you're unsure or the information isn't in the context, ask for clarification.
     def _build_context(self, chunks: list[dict[str, Any]]) -> str:
         """
         Build a structured context string from retrieved chunks.
-        
+
         This private method formats retrieved chunks into a single context string
         that will be included in the LLM prompt. Each chunk is prefixed with its
         citation information in a standardized format.
-        
+
         The format ensures the LLM can:
         - Understand which document each piece of information comes from
         - Generate proper citations in its response
         - Distinguish between different sources
-        
+
         Args:
             chunks: List of retrieved chunks, each containing 'text' and 'citation'
                 fields. The citation must include 'document_title' and optionally
                 'section_heading'.
-        
+
         Returns:
             A formatted string where each chunk is prefixed with its citation:
             ```
             [Doc: Title 1, Section: Heading 1]
             Chunk text here...
-            
+
             [Doc: Title 2, Section: Heading 2]
             Another chunk text...
             ```
-            
+
         Example:
             >>> chunks = [
             ...     {
@@ -400,21 +399,21 @@ If you're unsure or the information isn't in the context, ask for clarification.
     ) -> list[dict[str, Any]]:
         """
         Extract citation information from retrieved chunks for the response.
-        
+
         This private method processes the retrieved chunks and extracts citation
         metadata that will be returned with the response. Currently, it returns
         all chunks as potential citations (conservative approach to ensure all
         sources are credited).
-        
+
         Future enhancements could parse the response content to identify which
         specific citations were actually used in the generated text.
-        
+
         Args:
             content: The generated response text (currently not used, but available
                 for future citation matching algorithms).
             chunks: List of retrieved chunks that were used as context. Each must
                 have complete citation metadata.
-        
+
         Returns:
             A list of citation dictionaries formatted for the API response:
             [
@@ -426,13 +425,13 @@ If you're unsure or the information isn't in the context, ask for clarification.
                     "text_snippet": str  # First 200 chars of chunk text
                 }
             ]
-            
+
         Design Note:
             The current implementation returns all input chunks as citations
             (conservative approach). This ensures all sources are credited but
             may include some unused sources. A more sophisticated implementation
             could parse the response to match specific citations.
-            
+
         Example:
             >>> chunks = [
             ...     {
@@ -458,7 +457,9 @@ If you're unsure or the information isn't in the context, ask for clarification.
                 "document_title": chunk["citation"]["document_title"],
                 "section_heading": chunk["citation"].get("section_heading", ""),
                 "chunk_index": chunk["citation"]["chunk_index"],
-                "text_snippet": chunk["text"][:200] + "..." if len(chunk["text"]) > 200 else chunk["text"],
+                "text_snippet": chunk["text"][:200] + "..."
+                if len(chunk["text"]) > 200
+                else chunk["text"],
             }
             for chunk in chunks
         ]
@@ -472,38 +473,38 @@ If you're unsure or the information isn't in the context, ask for clarification.
 class SafetyAgent:
     """
     Agent responsible for safety validation of both input and output.
-    
+
     The SafetyAgent is the third stage in the RAG pipeline. It performs critical
     safety checks to ensure the system operates within appropriate boundaries for
     a mental health application. This agent validates both user inputs and system
     outputs using rule-based classification.
-    
+
     Safety checks include:
     - Crisis detection: Identifies mentions of self-harm, suicide, or violence
     - Medical boundary enforcement: Prevents medical diagnoses or prescriptions
     - Response grounding: Ensures outputs are based on retrieved context
     - Content appropriateness: Validates professional and helpful content
-    
+
     Attributes:
         classifier: SafetyClassifier instance that performs the actual classification
             using keyword matching and heuristic rules.
         policy: SafetyPolicy instance that defines safety rules, thresholds, and
             response templates for different violation types.
-    
+
     Design Notes:
         - Rule-based approach: Uses deterministic keywords for predictability
         - Conservative thresholds: Prefers false positives to avoid missing issues
         - Synchronous operation: Safety checks are fast and don't need async
         - No ML models: Avoids model drift and ensures audit ability
         - Privacy preserving: No user data is sent to external services
-        
+
     Example:
         >>> safety_agent = SafetyAgent(classifier, policy)
-        >>> 
+        >>>
         >>> # Check user input
         >>> result = safety_agent.check_input("I'm having trouble sleeping")
         >>> print(result.outcome)  # SafetyOutcome.OK
-        >>> 
+        >>>
         >>> # Check crisis input
         >>> result = safety_agent.check_input("I want to hurt myself")
         >>> print(result.outcome)  # SafetyOutcome.ESCALATED
@@ -525,7 +526,7 @@ class SafetyAgent:
             policy: An instance of SafetyPolicy that defines safety thresholds,
                 violation types, and response templates. This provides the
                 business logic for safety decisions.
-                
+
         Raises:
             ValueError: If classifier or policy is None or not properly initialized.
         """
@@ -535,18 +536,18 @@ class SafetyAgent:
     def check_input(self, message: str) -> SafetyResult:
         """
         Validate user input message for safety violations.
-        
+
         This method performs input validation to detect potentially harmful or
         inappropriate user messages before processing. It checks for:
         - Crisis indicators (self-harm, suicide ideation, violence)
         - Requests for medical diagnoses or prescriptions
         - Inappropriate or abusive content
-        
+
         Input safety checks are performed before retrieval and generation to:
         1. Prevent wasting resources on inappropriate requests
         2. Enable immediate crisis response when needed
         3. Maintain appropriate system boundaries
-        
+
         The safety outcome determines how the system proceeds:
         - OK: Continue with normal processing
         - ESCALATED: Return emergency resources immediately
@@ -564,17 +565,17 @@ class SafetyAgent:
                 "violation_type": ViolationType | None,  # Specific violation
                 "confidence": float  # Classification confidence (0.0-1.0)
             }
-            
+
         Example:
             >>> # Normal input
             >>> result = safety_agent.check_input("What are cognitive distortions?")
             >>> assert result.outcome == SafetyOutcome.OK
-            >>> 
+            >>>
             >>> # Crisis input
             >>> result = safety_agent.check_input("I'm thinking of ending it all")
             >>> assert result.outcome == SafetyOutcome.ESCALATED
             >>> print(result.reason)  # "Crisis keywords detected"
-            >>> 
+            >>>
             >>> # Medical request
             >>> result = safety_agent.check_input("Can you diagnose my depression?")
             >>> assert result.outcome == SafetyOutcome.REFUSED
@@ -592,7 +593,7 @@ class SafetyAgent:
     ) -> SafetyResult:
         """
         Validate generated response for safety and grounding.
-        
+
         This method performs output validation to ensure the system's response
         is safe, appropriate, and properly grounded in the retrieved context.
         It checks for:
@@ -601,12 +602,12 @@ class SafetyAgent:
         - Medical advice: Verifies response doesn't contain diagnoses or prescriptions
         - Empty context handling: Ensures appropriate responses when no context retrieved
         - Content appropriateness: Validates professional and helpful tone
-        
+
         Output safety checks are performed after generation to:
         1. Catch any LLM hallucinations or inappropriate outputs
         2. Verify responses stay within system boundaries
         3. Ensure citation and grounding requirements are met
-        
+
         The grounding check uses a ratio threshold: response length should not
         exceed context length by more than a configured factor (default 2x).
 
@@ -625,20 +626,20 @@ class SafetyAgent:
                 "violation_type": ViolationType | None,  # Specific violation
                 "confidence": float  # Classification confidence (0.0-1.0)
             }
-            
+
         Example:
             >>> # Well-grounded response
             >>> chunks = [{"text": "CBT involves..." * 100}]  # Substantial context
             >>> result = safety_agent.check_output("CBT is a therapy...", chunks)
             >>> assert result.outcome == SafetyOutcome.OK
-            >>> 
+            >>>
             >>> # Poorly grounded response (hallucination)
             >>> chunks = [{"text": "Short context"}]
             >>> long_response = "Very long ungrounded response..." * 1000
             >>> result = safety_agent.check_output(long_response, chunks)
             >>> assert result.outcome == SafetyOutcome.REFUSED
             >>> print(result.reason)  # "Response not grounded in context"
-            >>> 
+            >>>
             >>> # Medical advice in output
             >>> result = safety_agent.check_output(
             ...     "You should take antidepressants",
@@ -660,37 +661,37 @@ class SafetyAgent:
 class FinalizerAgent:
     """
     Agent responsible for making final decisions on response delivery.
-    
+
     The FinalizerAgent is the fourth and final stage in the RAG pipeline. It takes
     the draft response and safety check results, then makes the final decision on
     what to return to the user. This agent implements the system's safety policy
     by routing responses appropriately based on safety outcomes.
-    
+
     Response routing logic:
     - SafetyOutcome.OK: Return the draft response as-is
     - SafetyOutcome.ESCALATED: Replace with emergency resources and crisis helpline
     - SafetyOutcome.REFUSED: Replace with appropriate refusal message
-    
+
     Attributes:
         policy: SafetyPolicy instance that provides response templates for
             different safety outcomes (emergency resources, medical disclaimer, etc.).
-    
+
     Design Notes:
         - Final authority: This agent makes the ultimate decision on what users see
         - Safety first: Always prioritizes safety outcomes over draft content
         - Transparency: Includes safety outcome and reason in all responses
         - Resource injection: Automatically adds emergency contacts when needed
         - Synchronous operation: Simple routing logic doesn't need async
-        
+
     Example:
         >>> finalizer = FinalizerAgent(policy)
-        >>> 
+        >>>
         >>> # Normal response
         >>> draft = {"content": "CBT is...", "citations": [...]}
         >>> safety_result = SafetyResult(outcome=SafetyOutcome.OK)
         >>> final = finalizer.finalize(draft, safety_result)
         >>> print(final["content"])  # Original draft content
-        >>> 
+        >>>
         >>> # Crisis response
         >>> safety_result = SafetyResult(
         ...     outcome=SafetyOutcome.ESCALATED,
@@ -708,7 +709,7 @@ class FinalizerAgent:
             policy: An instance of SafetyPolicy that provides response templates
                 and configuration for different safety outcomes. This includes
                 emergency resources text, medical disclaimers, and refusal messages.
-                
+
         Raises:
             ValueError: If policy is None or not properly initialized.
         """
@@ -721,19 +722,19 @@ class FinalizerAgent:
     ) -> dict[str, Any]:
         """
         Make final decision on response delivery based on safety check results.
-        
+
         This method implements the system's safety policy by routing responses
         according to the safety outcome. It ensures that:
         - Crisis situations receive immediate appropriate resources
         - Policy violations result in clear, helpful refusals
         - Safe responses are delivered with proper metadata
-        
+
         The finalization process:
         1. Examines the safety_result outcome
         2. Chooses appropriate response content based on outcome
         3. Includes safety metadata for logging and monitoring
         4. Preserves citations only for OK outcomes
-        
+
         All responses include safety_outcome and safety_reason fields for:
         - Audit trails and compliance
         - Monitoring and alerting
@@ -763,13 +764,13 @@ class FinalizerAgent:
                 "safety_reason": str | None,  # Explanation if not OK
                 "usage": dict  # Optional token usage (only for OK outcomes)
             }
-            
+
         Response by outcome:
         - OK: Returns draft with all citations and metadata intact
         - ESCALATED: Returns emergency resources with crisis helpline info
         - REFUSED (medical): Returns medical disclaimer
         - REFUSED (other): Returns refusal with explanation
-            
+
         Example:
             >>> # Safe response flow
             >>> draft = {
@@ -782,7 +783,7 @@ class FinalizerAgent:
             >>> assert final["content"] == draft["content"]
             >>> assert final["safety_outcome"] == "ok"
             >>> assert "usage" in final
-            >>> 
+            >>>
             >>> # Crisis escalation flow
             >>> safety_result = SafetyResult(
             ...     outcome=SafetyOutcome.ESCALATED,
@@ -793,7 +794,7 @@ class FinalizerAgent:
             >>> assert "988" in final["content"]  # Crisis helpline
             >>> assert final["citations"] == []
             >>> assert final["safety_reason"] == "Self-harm keywords detected"
-            >>> 
+            >>>
             >>> # Medical advice refusal flow
             >>> safety_result = SafetyResult(
             ...     outcome=SafetyOutcome.REFUSED,

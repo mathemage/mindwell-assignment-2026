@@ -54,10 +54,7 @@ async def send_chat_message(
             message=ChatMessage(
                 id=response["message"]["id"],
                 content=response["message"]["content"],
-                citations=[
-                    Citation(**citation)
-                    for citation in response["message"]["citations"]
-                ],
+                citations=[Citation(**citation) for citation in response["message"]["citations"]],
                 safety_outcome=response["message"]["safety_outcome"],
             ),
         )
