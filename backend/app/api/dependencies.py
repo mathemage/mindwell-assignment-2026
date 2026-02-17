@@ -2,7 +2,7 @@
 
 from functools import lru_cache
 
-from app.agents.agents import DraftAgent, FinalizerAgent, RetrieverAgent, SafetyAgent
+from app.agents.features import DraftAgent, FinalizerAgent, RetrieverAgent, SafetyAgent
 from app.agents.orchestrator import AgentOrchestrator
 from app.llm.openai_provider import get_llm_provider
 from app.rag.chunking import TextChunker

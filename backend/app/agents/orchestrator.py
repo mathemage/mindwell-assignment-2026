@@ -5,7 +5,7 @@ from typing import Any
 
 from sqlalchemy.orm import Session
 
-from app.agents.agents import DraftAgent, FinalizerAgent, RetrieverAgent, SafetyAgent
+from app.agents.features import DraftAgent, FinalizerAgent, RetrieverAgent, SafetyAgent
 from app.core.logging import get_logger
 from app.safety.policy import SafetyOutcome
 
