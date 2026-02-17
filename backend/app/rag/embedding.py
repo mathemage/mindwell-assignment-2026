@@ -53,7 +53,7 @@ class EmbeddingService:
         )
 
         db.add(embedding)
-        db.commit()
+        db.flush()  # Use flush instead of commit to preserve transaction atomicity
         db.refresh(embedding)
 
         logger.info("Embedding created", embedding_id=embedding.id)

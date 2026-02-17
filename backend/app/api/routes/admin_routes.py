@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from sqlalchemy.orm import Session
 
 from app.api.auth import get_current_admin_user
+from app.api.dependencies import get_document_service
 from app.api.schemas.schemas import (
     DocumentListItem,
     DocumentResponse,
@@ -25,7 +26,7 @@ async def upload_document(
     file: UploadFile = File(...),
     current_user: User = Depends(get_current_admin_user),
     db: Session = Depends(get_db),
-    doc_service: DocumentService = Depends(),
+    doc_service: DocumentService = Depends(get_document_service),
 ) -> DocumentUploadResponse:
     """
     Upload a document to the knowledge base.
@@ -71,7 +72,7 @@ def list_documents(
     offset: int = 0,
     current_user: User = Depends(get_current_admin_user),
     db: Session = Depends(get_db),
-    doc_service: DocumentService = Depends(),
+    doc_service: DocumentService = Depends(get_document_service),
 ) -> list[DocumentListItem]:
     """List documents in the knowledge base."""
     documents = doc_service.list_documents(db, limit, offset)
@@ -92,7 +93,7 @@ def get_document(
     document_id: str,
     current_user: User = Depends(get_current_admin_user),
     db: Session = Depends(get_db),
-    doc_service: DocumentService = Depends(),
+    doc_service: DocumentService = Depends(get_document_service),
 ) -> DocumentResponse:
     """Get a specific document."""
     document = doc_service.get_document(db, document_id)
@@ -115,7 +116,7 @@ async def reindex_document(
     document_id: str,
     current_user: User = Depends(get_current_admin_user),
     db: Session = Depends(get_db),
-    doc_service: DocumentService = Depends(),
+    doc_service: DocumentService = Depends(get_document_service),
 ) -> ReindexResponse:
     """
     Re-index a document (regenerate chunks and embeddings).

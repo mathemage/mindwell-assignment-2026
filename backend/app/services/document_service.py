@@ -163,7 +163,13 @@ class DocumentService:
                 pdf_reader = PdfReader(io.BytesIO(file_content))
                 text_parts = []
                 for page in pdf_reader.pages:
-                    text_parts.append(page.extract_text())
+                    extracted_text = page.extract_text()
+                    if extracted_text:
+                        text_parts.append(extracted_text)
+
+                if not text_parts:
+                    raise DocumentProcessingError("PDF contains no extractable text")
+
                 content = "\n\n".join(text_parts)
 
                 return await self.ingest_document(

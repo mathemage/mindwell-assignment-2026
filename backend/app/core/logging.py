@@ -11,6 +11,28 @@ from app.core.config import get_settings
 settings = get_settings()
 
 
+def sanitize_event_dict(logger: Any, method_name: str, event_dict: dict[str, Any]) -> dict[str, Any]:
+    """
+    Sanitize event dict to redact PII before logging.
+
+    This processor runs before rendering and redacts sensitive information
+    from all string values in the event dict.
+    """
+    # Import here to avoid circular dependency
+    from app.core.security import redact_pii
+
+    sanitized = {}
+    for key, value in event_dict.items():
+        if isinstance(value, str):
+            sanitized[key] = redact_pii(value)
+        elif isinstance(value, dict):
+            sanitized[key] = {k: redact_pii(v) if isinstance(v, str) else v for k, v in value.items()}
+        else:
+            sanitized[key] = value
+
+    return sanitized
+
+
 def setup_logging() -> None:
     """Configure structured logging."""
     # Configure structlog
@@ -25,6 +47,7 @@ def setup_logging() -> None:
             structlog.processors.StackInfoRenderer(),
             structlog.processors.format_exc_info,
             structlog.processors.UnicodeDecoder(),
+            sanitize_event_dict,  # Add PII sanitization processor
             structlog.processors.JSONRenderer() if not settings.is_development
             else structlog.dev.ConsoleRenderer(),
         ],

@@ -99,7 +99,10 @@ class ChatService:
         safety_check = SafetyCheck(
             message_id=assistant_message.id,
             outcome=response.get("safety_outcome", "ok"),
+            violation_type=response.get("violation_type"),
+            severity=response.get("severity"),
             reason=response.get("safety_reason"),
+            confidence=response.get("confidence"),
         )
         db.add(safety_check)
 

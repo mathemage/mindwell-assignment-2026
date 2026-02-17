@@ -49,8 +49,8 @@ class TextChunker:
         chunks = []
         metadata = metadata or {}
 
-        # Split by headings
-        sections = re.split(r'\n(#{1,6})\s+(.+)\n', text)
+        # Split by headings (match at start of string or after newline)
+        sections = re.split(r'(?:^|\n)(#{1,6})\s+(.+)\n', text, flags=re.MULTILINE)
 
         current_heading = ""
         current_level = 0

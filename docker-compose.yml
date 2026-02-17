@@ -5,15 +5,15 @@ services:
     image: pgvector/pgvector:pg16
     container_name: mindwell-postgres
     environment:
-      POSTGRES_DB: mindwell
-      POSTGRES_USER: mindwell
-      POSTGRES_PASSWORD: mindwell
+      POSTGRES_DB: ${POSTGRES_DB:-mindwell}
+      POSTGRES_USER: ${POSTGRES_USER:-mindwell}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-mindwell}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U mindwell"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-mindwell}"]
       interval: 10s
       timeout: 5s
       retries: 5

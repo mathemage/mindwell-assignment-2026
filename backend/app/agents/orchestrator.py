@@ -56,7 +56,7 @@ class AgentOrchestrator:
         Returns:
             Final response with citations and safety info
         """
-        logger.info("Orchestrator: Starting pipeline", message_preview=message[:100])
+        logger.info("Orchestrator: Starting pipeline", message_length=len(message))
 
         try:
             # Step 1: Safety check on input

@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.api.auth import get_current_user
+from app.api.dependencies import get_chat_service
 from app.api.schemas.schemas import (
     ChatMessage,
     ChatRequest,
@@ -27,7 +28,7 @@ async def send_chat_message(
     request: ChatRequest,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
-    chat_service: ChatService = Depends(),
+    chat_service: ChatService = Depends(get_chat_service),
 ) -> ChatResponse:
     """
     Send a chat message and get a response.
@@ -71,7 +72,7 @@ async def send_chat_message(
 def list_conversations(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
-    chat_service: ChatService = Depends(),
+    chat_service: ChatService = Depends(get_chat_service),
 ) -> list[ConversationListItem]:
     """List user's conversations."""
     conversations = chat_service.list_conversations(db, current_user)
@@ -83,7 +84,7 @@ def get_conversation_history(
     conversation_id: str,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
-    chat_service: ChatService = Depends(),
+    chat_service: ChatService = Depends(get_chat_service),
 ) -> list[MessageListItem]:
     """Get conversation history."""
     messages = chat_service.get_conversation_history(db, current_user, conversation_id)
