@@ -27,11 +27,11 @@ async def test_pdf_with_no_text(test_db, document_service):
     # Create a blank PDF (no text)
     pdf_writer = PdfWriter()
     pdf_writer.add_blank_page(width=200, height=200)
-    
+
     pdf_bytes = io.BytesIO()
     pdf_writer.write(pdf_bytes)
     pdf_bytes.seek(0)
-    
+
     with pytest.raises(DocumentProcessingError, match="no extractable text"):
         await document_service.ingest_file(
             test_db,
