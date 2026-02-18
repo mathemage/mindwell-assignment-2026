@@ -16,7 +16,7 @@ class User(Base):
 
     __tablename__ = "users"
 
-    id: Mapped[uuid.UUID] = mapped_column(
+    id: Mapped[str] = mapped_column(
         String, primary_key=True, default=lambda: str(uuid.uuid4())
     )
     email: Mapped[str] = mapped_column(String, unique=True, index=True)
@@ -42,7 +42,7 @@ class Document(Base):
 
     __tablename__ = "documents"
 
-    id: Mapped[uuid.UUID] = mapped_column(
+    id: Mapped[str] = mapped_column(
         String, primary_key=True, default=lambda: str(uuid.uuid4())
     )
     title: Mapped[str] = mapped_column(String, index=True)
@@ -65,7 +65,7 @@ class Chunk(Base):
 
     __tablename__ = "chunks"
 
-    id: Mapped[uuid.UUID] = mapped_column(
+    id: Mapped[str] = mapped_column(
         String, primary_key=True, default=lambda: str(uuid.uuid4())
     )
     document_id: Mapped[str] = mapped_column(String, ForeignKey("documents.id"), index=True)
@@ -86,7 +86,7 @@ class Embedding(Base):
 
     __tablename__ = "embeddings"
 
-    id: Mapped[uuid.UUID] = mapped_column(
+    id: Mapped[str] = mapped_column(
         String, primary_key=True, default=lambda: str(uuid.uuid4())
     )
     chunk_id: Mapped[str] = mapped_column(String, ForeignKey("chunks.id"), unique=True, index=True)
@@ -103,7 +103,7 @@ class Conversation(Base):
 
     __tablename__ = "conversations"
 
-    id: Mapped[uuid.UUID] = mapped_column(
+    id: Mapped[str] = mapped_column(
         String, primary_key=True, default=lambda: str(uuid.uuid4())
     )
     user_id: Mapped[str] = mapped_column(String, ForeignKey("users.id"), index=True)
@@ -125,7 +125,7 @@ class Message(Base):
 
     __tablename__ = "messages"
 
-    id: Mapped[uuid.UUID] = mapped_column(
+    id: Mapped[str] = mapped_column(
         String, primary_key=True, default=lambda: str(uuid.uuid4())
     )
     conversation_id: Mapped[str] = mapped_column(
@@ -148,7 +148,7 @@ class SafetyCheck(Base):
 
     __tablename__ = "safety_checks"
 
-    id: Mapped[uuid.UUID] = mapped_column(
+    id: Mapped[str] = mapped_column(
         String, primary_key=True, default=lambda: str(uuid.uuid4())
     )
     message_id: Mapped[str] = mapped_column(String, ForeignKey("messages.id"), unique=True, index=True)
