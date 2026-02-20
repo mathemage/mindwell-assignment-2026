@@ -71,7 +71,8 @@ Patient submits journal entry
 ### Orchestration Design
 
 The pipeline is implemented as a **sequential state machine** (see
-`backend/app/agents/orchestrator.py`). Each agent is a pure, testable function.
+`backend/app/agents/orchestrator.py`). Each agent is a class with well-defined
+interfaces and injected dependencies, making them testable and composable.
 Timeouts are enforced with `asyncio.wait_for` so a slow LLM call never hangs the
 whole request.
 
@@ -103,10 +104,17 @@ The current pure-Python approach was chosen for minimal dependencies in the MVP.
 | **Relational data** | Users, conversations, and embeddings in one engine simplifies ops |
 | **Audit trail** | Native row-level timestamping; no extra infrastructure for compliance logs |
 
-Patient facts are stored as **rows in the `Embedding` table** keyed by
-`user_id` (pseudonymised UUID). A similarity query over that user's rows
-retrieves relevant memories from *any* past session — giving the system
-long-term memory without a separate memory microservice.
+The database has two distinct memory layers:
+
+- **Shared CBT Knowledge Base** — `Document → Chunk → Embedding` (no user
+  scoping). The `Embedding` table stores vector embeddings of knowledge-base
+  chunks only; it has no `user_id` field. All patients draw on the same corpus
+  of CBT protocols.
+- **Per-patient episodic memory** — `User → Conversation → Message` (scoped
+  by `user_id`). A patient's journaling history, past session exchanges, and
+  clinical observations live here. Semantic search over a patient's past
+  `Message` rows (embedded at write time) provides long-term memory without a
+  separate memory microservice.
 
 ### Persistence: Crash-Safe Strategy
 
@@ -189,9 +197,12 @@ or fine-tuned. The monitoring strategy is:
 Every query that touches patient data is scoped by `user_id`:
 
 ```python
-# RetrieverAgent — simplified example
-db.query(Embedding).filter(
-    Embedding.chunk.has(Chunk.document.has(Document.owner_id == user.id))
+# chat_service — simplified example: conversations and messages are
+# always scoped to the requesting user
+conversations = (
+    db.query(Conversation)
+    .filter(Conversation.user_id == user.id)
+    .all()
 )
 ```
 
@@ -243,13 +254,15 @@ The pipeline has three main latency contributors:
 |---|---|---|
 | Input safety check | ~5 ms | Rule-based (no LLM call) |
 | Vector retrieval | 50–300 ms | pgvector index (HNSW) |
-| LLM generation | 1–5 s | Streaming SSE; show partial text |
+| LLM generation | 1–5 s | Recommended: streaming SSE; show partial text |
 | Output safety + finalize | ~10 ms | Rule-based |
 
 The safety checks are intentionally rule-based (not LLM-based) so they add
-near-zero latency. The LLM call dominates; the solution is **response streaming**
-via Server-Sent Events: the therapist sees the draft text appearing word-by-word
-rather than waiting for the full response.
+near-zero latency. The LLM call dominates; the recommended solution is
+**response streaming** via Server-Sent Events (not yet implemented in the MVP —
+add `StreamingResponse` to the FastAPI route and switch to a streaming LLM call):
+the therapist would see the draft text appearing word-by-word rather than waiting
+for the full response.
 
 ### Handling a 3-Second Memory Retrieval
 
