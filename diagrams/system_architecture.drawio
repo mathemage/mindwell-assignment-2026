@@ -1,0 +1,297 @@
+<mxfile host="app.diagrams.net" modified="2026-02-20T16:42:00.000Z" agent="Mindwell AI" version="21.0.0" type="device">
+  <diagram name="Clinical Supervisor Architecture" id="clinical-supervisor">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <!-- VPC boundary                                                        -->
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <mxCell id="vpc" value="AWS / Azure / GCP — Strictly Isolated VPC" style="points=[[0,0],[0.25,0],[0.5,0],[0.75,0],[1,0],[1,0.25],[1,0.5],[1,0.75],[1,1],[0.75,1],[0.5,1],[0.25,1],[0,1],[0,0.75],[0,0.5],[0,0.25]];shape=mxgraph.cisco.sites.generic_building;sketch=0;html=1;pointerEvents=1;dashed=1;fillColor=none;strokeColor=#006EAF;strokeWidth=2;verticalLabelPosition=top;verticalAlign=bottom;align=center;outlineConnect=0;fontStyle=1;fontSize=13;fontColor=#006EAF;" vertex="1" parent="1">
+          <mxGeometry x="50" y="30" width="1560" height="1100" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <!-- ACTORS (outside the main flow lanes)                               -->
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+
+        <!-- Patient -->
+        <mxCell id="patient" value="Patient" style="shape=mxgraph.basic.person;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="90" y="110" width="60" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Therapist -->
+        <mxCell id="therapist" value="Therapist" style="shape=mxgraph.basic.person;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="90" y="700" width="60" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <!-- LANE 1 — API Gateway / Auth Layer                                  -->
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <mxCell id="lane1_bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;opacity=30;" vertex="1" parent="1">
+          <mxGeometry x="200" y="70" width="260" height="960" as="geometry" />
+        </mxCell>
+        <mxCell id="lane1_title" value="API Gateway &amp; Auth" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontStyle=1;fontSize=11;fontColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="200" y="75" width="260" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- FastAPI endpoint -->
+        <mxCell id="api" value="FastAPI Endpoint&#xa;/chat  /admin/docs  /auth" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="220" y="130" width="220" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- JWT Auth -->
+        <mxCell id="auth" value="JWT Authentication&#xa;+ RBAC" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="220" y="230" width="220" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- PII Redaction -->
+        <mxCell id="pii" value="PII Redactor&#xa;(email / phone / SSN → [REDACTED])" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="220" y="330" width="220" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Therapist Review UI -->
+        <mxCell id="therapist_ui" value="Therapist Review UI&#xa;(Draft + Approve / Edit)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="220" y="720" width="220" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <!-- LANE 2 — Agent Orchestrator (LangGraph-style pipeline)             -->
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <mxCell id="lane2_bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;opacity=20;" vertex="1" parent="1">
+          <mxGeometry x="490" y="70" width="380" height="960" as="geometry" />
+        </mxCell>
+        <mxCell id="lane2_title" value="Agent Orchestrator (Sequential Pipeline)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontStyle=1;fontSize=11;fontColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="490" y="75" width="380" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Safety Agent Input -->
+        <mxCell id="safety_in" value="SafetyAgent — Input Check&#xa;Crisis / Medical boundary detection&#xa;→ Escalate or OK" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="510" y="130" width="340" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Retriever Agent -->
+        <mxCell id="retriever" value="RetrieverAgent&#xa;Embed query → cosine-similarity search&#xa;→ Top-k CBT knowledge chunks" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="510" y="250" width="340" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Draft Agent -->
+        <mxCell id="drafter" value="DraftAgent&#xa;Build context window&#xa;→ LLM call → Extract citations" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="510" y="370" width="340" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Safety Agent Output -->
+        <mxCell id="safety_out" value="SafetyAgent — Output Check&#xa;Groundedness verification + length check&#xa;→ Reject if unsupported" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="510" y="490" width="340" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Finalizer Agent -->
+        <mxCell id="finalizer" value="FinalizerAgent&#xa;Compose response + citations&#xa;→ Draft ready for therapist" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="510" y="610" width="340" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <!-- LANE 3 — Data & Memory Layer                                       -->
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <mxCell id="lane3_bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;opacity=20;" vertex="1" parent="1">
+          <mxGeometry x="910" y="70" width="380" height="960" as="geometry" />
+        </mxCell>
+        <mxCell id="lane3_title" value="Data &amp; Memory Layer" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontStyle=1;fontSize=11;fontColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="910" y="75" width="380" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- PostgreSQL + pgvector -->
+        <mxCell id="postgres" value="PostgreSQL 16 + pgvector&#xa;(Self-hosted — Docker Volume)&#xa;&#xa;Tables: users · documents · chunks&#xa;embeddings · conversations · messages&#xa;safety_checks" style="shape=mxgraph.flowchart.database;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;verticalLabelPosition=middle;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="930" y="130" width="340" height="160" as="geometry" />
+        </mxCell>
+
+        <!-- Patient Memory Store -->
+        <mxCell id="memory" value="Long-Term Patient Memory Store&#xa;(per-patient rows, pseudonymised IDs)&#xa;Cosine-similarity recall via pgvector" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="930" y="340" width="340" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- CBT Knowledge Base -->
+        <mxCell id="kb" value="CBT Knowledge Base&#xa;(Markdown / PDF / TXT documents)&#xa;Chunked + embedded at ingest time" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="930" y="470" width="340" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Persistence note -->
+        <mxCell id="persist" value="Persistence Strategy&#xa;• Named Docker volume → host disk&#xa;• PostgreSQL WAL → zero data loss on crash&#xa;• Periodic pg_dump → S3 (encrypted)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="930" y="600" width="340" height="90" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <!-- LANE 4 — Observability & LLM                                      -->
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <mxCell id="lane4_bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;opacity=20;" vertex="1" parent="1">
+          <mxGeometry x="1330" y="70" width="250" height="960" as="geometry" />
+        </mxCell>
+        <mxCell id="lane4_title" value="LLM &amp; Observability" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontStyle=1;fontSize=11;fontColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="1330" y="75" width="250" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- LLM Provider -->
+        <mxCell id="llm" value="LLM Provider&#xa;(OpenAI-compatible)&#xa;Self-hosted: Ollama / vLLM&#xa;inside VPC" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1350" y="130" width="210" height="100" as="geometry" />
+        </mxCell>
+
+        <!-- Structured Logging -->
+        <mxCell id="logging" value="Structured Logging&#xa;structlog + JSON&#xa;PII auto-redaction&#xa;(sanitize_event_dict)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1350" y="280" width="210" height="90" as="geometry" />
+        </mxCell>
+
+        <!-- OpenTelemetry / Jaeger -->
+        <mxCell id="tracing" value="Distributed Tracing&#xa;OpenTelemetry SDK&#xa;→ Self-hosted Jaeger&#xa;(debug hallucinations)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1350" y="420" width="210" height="90" as="geometry" />
+        </mxCell>
+
+        <!-- Drift Monitor -->
+        <mxCell id="drift" value="Drift Monitor&#xa;Offline CBT benchmark evals&#xa;Tone / protocol alignment scoring&#xa;Alerts on regression" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1350" y="560" width="210" height="90" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <!-- ARROWS — main flow                                                  -->
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+
+        <!-- Patient → API -->
+        <mxCell id="e1" value="Journal entry / homework" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;fontSize=9;" edge="1" source="patient" target="api" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- API → Auth -->
+        <mxCell id="e2" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="api" target="auth" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Auth → PII -->
+        <mxCell id="e3" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="auth" target="pii" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- PII → SafetyIn -->
+        <mxCell id="e4" value="Sanitised message" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;fontSize=9;" edge="1" source="pii" target="safety_in" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- SafetyIn → Retriever -->
+        <mxCell id="e5" value="OK" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;" edge="1" source="safety_in" target="retriever" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Retriever → Drafter -->
+        <mxCell id="e6" value="Top-k chunks" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;" edge="1" source="retriever" target="drafter" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Drafter → SafetyOut -->
+        <mxCell id="e7" value="Draft + citations" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;" edge="1" source="drafter" target="safety_out" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- SafetyOut → Finalizer -->
+        <mxCell id="e8" value="Grounded OK" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;" edge="1" source="safety_out" target="finalizer" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Finalizer → TherapistUI -->
+        <mxCell id="e9" value="Draft response" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0;exitY=0.5;entryX=1;entryY=0.5;fontSize=9;" edge="1" source="finalizer" target="therapist_ui" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- TherapistUI → Therapist -->
+        <mxCell id="e10" value="Approve / Edit" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0;exitY=0.5;entryX=1;entryY=0.5;fontSize=9;" edge="1" source="therapist_ui" target="therapist" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Retriever ↔ Postgres (memory + KB) -->
+        <mxCell id="e11" value="embed + search" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;fontSize=9;" edge="1" source="retriever" target="postgres" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Drafter → LLM -->
+        <mxCell id="e12" value="context window" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;fontSize=9;" edge="1" source="drafter" target="llm" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Messages stored in Postgres -->
+        <mxCell id="e13" value="store message + safety record" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;fontSize=9;" edge="1" source="finalizer" target="postgres" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Agents → Logging -->
+        <mxCell id="e14" value="structured events" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;fontSize=9;dashed=1;" edge="1" source="safety_out" target="logging" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Logging → Tracing -->
+        <mxCell id="e15" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="logging" target="tracing" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Tracing → Drift -->
+        <mxCell id="e16" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="tracing" target="drift" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <!-- ESCALATION path                                                    -->
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <mxCell id="escalate" value="Emergency Resources&#xa;(crisis detected)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="510" y="860" width="340" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_esc" value="crisis / refused" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;strokeColor=#b85450;" edge="1" source="safety_in" target="escalate" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <!-- LEGEND                                                              -->
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <mxCell id="legend_bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;opacity=70;" vertex="1" parent="1">
+          <mxGeometry x="930" y="740" width="340" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="legend_title" value="Legend" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="945" y="748" width="200" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="l1" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="945" y="775" width="25" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="l1t" value="API / Auth Layer" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="978" y="775" width="140" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="l2" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="945" y="800" width="25" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="l2t" value="Agent Pipeline" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="978" y="800" width="140" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="l3" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="945" y="825" width="25" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="l3t" value="Data / Memory" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="978" y="825" width="140" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="l4" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="945" y="850" width="25" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="l4t" value="LLM / Observability" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="978" y="850" width="140" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="l5" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="945" y="875" width="25" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="l5t" value="Therapist-facing output" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="978" y="875" width="160" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="l6" value="- - -" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="945" y="900" width="25" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="l6t" value="Async / side-channel event" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="978" y="900" width="180" height="18" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
