@@ -11,12 +11,14 @@ from app.api.schemas.schemas import (
     DocumentUploadResponse,
     ReindexResponse,
 )
+from app.core.config import get_settings
 from app.core.logging import get_logger
 from app.db.connection import get_db
 from app.db.models import User
 from app.services.document_service import DocumentService
 
 logger = get_logger(__name__)
+settings = get_settings()
 
 router = APIRouter(prefix="/admin/docs", tags=["admin"])
 
@@ -63,7 +65,8 @@ async def upload_document(
 
     except Exception as e:
         logger.error("Document upload failed", error=str(e), exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e)) from e
+        detail = str(e) if settings.is_development else "Internal server error"
+        raise HTTPException(status_code=500, detail=detail) from e
 
 
 @router.get("", response_model=list[DocumentListItem])
@@ -140,4 +143,5 @@ async def reindex_document(
 
     except Exception as e:
         logger.error("Document reindex failed", error=str(e), exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e)) from e
+        detail = str(e) if settings.is_development else "Internal server error"
+        raise HTTPException(status_code=500, detail=detail) from e

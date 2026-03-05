@@ -42,7 +42,7 @@ class RetrieverAgent:
         Returns:
             Retrieved chunks
         """
-        logger.info("RetrieverAgent: Retrieving chunks", query=query)
+        logger.info("RetrieverAgent: Retrieving chunks", query_length=len(query))
         chunks = await self.retrieval_service.retrieve(db, query, top_k)
         logger.info("RetrieverAgent: Retrieved chunks", count=len(chunks))
         return chunks

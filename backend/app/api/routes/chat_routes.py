@@ -13,12 +13,14 @@ from app.api.schemas.schemas import (
     ConversationListItem,
     MessageListItem,
 )
+from app.core.config import get_settings
 from app.core.logging import get_logger
 from app.db.connection import get_db
 from app.db.models import User
 from app.services.chat_service import ChatService
 
 logger = get_logger(__name__)
+settings = get_settings()
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
@@ -65,7 +67,8 @@ async def send_chat_message(
 
     except Exception as e:
         logger.error("Chat request failed", error=str(e), exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e)) from e
+        detail = str(e) if settings.is_development else "Internal server error"
+        raise HTTPException(status_code=500, detail=detail) from e
 
 
 @router.get("/conversations", response_model=list[ConversationListItem])

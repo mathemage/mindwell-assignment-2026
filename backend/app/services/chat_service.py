@@ -73,7 +73,7 @@ class ChatService:
         user_message = Message(
             conversation_id=conversation.id,
             role="user",
-            content=redact_pii(content) if redact_pii else content,
+            content=redact_pii(content),
             message_metadata={"original_length": len(content)},
         )
         db.add(user_message)

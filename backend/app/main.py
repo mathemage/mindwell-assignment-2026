@@ -24,6 +24,10 @@ async def lifespan(app: FastAPI):
     setup_logging()
     logger.info("Starting Mindwell API", environment=settings.environment)
 
+    # Validate configuration for production
+    if settings.is_production and settings.secret_key == "dev-secret-key-change-in-production":
+        raise RuntimeError("SECRET_KEY must be changed from the default value in production")
+
     # Initialize database
     try:
         init_db()
@@ -54,7 +58,7 @@ app = FastAPI(
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"] if settings.is_development else [],
+    allow_origins=["*"] if settings.is_development else settings.cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

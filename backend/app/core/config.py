@@ -57,6 +57,12 @@ class Settings(BaseSettings):
     chunk_overlap: int = Field(default=150, description="Overlap between chunks")
     top_k_retrieval: int = Field(default=5, description="Number of top chunks to retrieve")
 
+    # CORS
+    cors_origins: list[str] = Field(
+        default=[],
+        description="Allowed CORS origins for production (comma-separated via env var CORS_ORIGINS)",
+    )
+
     # Safety
     enable_safety_checks: bool = Field(default=True, description="Enable safety guardrails")
     redact_pii: bool = Field(default=True, description="Redact PII from logs and storage")
