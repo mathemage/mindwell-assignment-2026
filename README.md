@@ -120,6 +120,12 @@ curl -X POST http://localhost:8000/chat \
 
 See [SECURITY.md](SECURITY.md) and [DATA_PRIVACY.md](DATA_PRIVACY.md) for details.
 
+## License
+
+This project is licensed under the **GNU Affero General Public License v3.0 or later** (`AGPL-3.0-or-later`). See [LICENSE](LICENSE) for the full text.
+
+> **Note:** Third-party dependencies retain their own licenses (see each package's documentation).
+
 ## Disclaimer
 
 This is an AI assistant for educational purposes. It is NOT a replacement for professional mental health care.
