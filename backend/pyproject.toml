@@ -77,7 +77,6 @@ plugins = ["pydantic.mypy"]
 [[tool.mypy.overrides]]
 module = [
     "pgvector.*",
-    "passlib.*",
     "jose.*",
 ]
 ignore_missing_imports = true

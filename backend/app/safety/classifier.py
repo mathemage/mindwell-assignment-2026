@@ -107,8 +107,7 @@ class SafetyClassifier:
             Safety result
         """
         matched_keywords = [
-            keyword for keyword in self.policy.CRISIS_KEYWORDS
-            if keyword in message
+            keyword for keyword in self.policy.CRISIS_KEYWORDS if keyword in message
         ]
 
         if matched_keywords:
@@ -139,10 +138,10 @@ class SafetyClassifier:
         """
         # Check for diagnostic or prescriptive language
         diagnostic_patterns = [
-            r'\b(diagnose|diagnosis)\b',
-            r'\b(prescribe|prescription)\b',
-            r'\b(medication|medicine)\b.*\b(take|should)\b',
-            r'\bdo i have\b.*\b(disease|disorder|condition)\b',
+            r"\b(diagnose|diagnosis)\b",
+            r"\b(prescribe|prescription)\b",
+            r"\b(medication|medicine)\b.*\b(take|should)\b",
+            r"\bdo i have\b.*\b(disease|disorder|condition)\b",
         ]
 
         for pattern in diagnostic_patterns:

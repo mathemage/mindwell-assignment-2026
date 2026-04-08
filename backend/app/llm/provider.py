@@ -7,6 +7,8 @@ from typing import Any
 class LLMProvider(ABC):
     """Abstract base class for LLM providers."""
 
+    embedding_model: str
+
     @abstractmethod
     async def generate_embedding(self, text: str) -> list[float]:
         """

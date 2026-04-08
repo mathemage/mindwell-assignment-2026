@@ -179,7 +179,7 @@ Code Quality ✅
 - Safety evaluation dataset (JSON)
 
 ### CI/CD (1 file)
-- GitHub Actions workflow (lint, test, typecheck)
+- GitHub Actions workflow with path-filtered backend lint, test, and typecheck jobs; workflow changes still trigger backend validation
 
 ## Future Enhancements
 
@@ -190,6 +190,8 @@ Code Quality ✅
 4. Async workers for embeddings
 5. Admin dashboard UI
 6. More comprehensive test coverage
+7. Add docs-focused CI checks for Markdown-only changes
+8. Add GitHub Actions workflow linting or validation beyond YAML parsing
 
 ### Medium-term (Scale)
 1. Horizontal scaling (load balancer)

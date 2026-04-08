@@ -69,18 +69,20 @@ class RetrievalService:
         for chunk, document, distance in results:
             similarity = 1 - distance  # Convert distance to similarity
 
-            retrieved.append({
-                "chunk_id": chunk.id,
-                "text": chunk.text,
-                "similarity": similarity,
-                "citation": {
-                    "document_id": document.id,
-                    "document_title": document.title,
-                    "section_heading": chunk.chunk_metadata.get("heading", ""),
-                    "chunk_index": chunk.chunk_index,
-                },
-                "metadata": chunk.chunk_metadata,
-            })
+            retrieved.append(
+                {
+                    "chunk_id": chunk.id,
+                    "text": chunk.text,
+                    "similarity": similarity,
+                    "citation": {
+                        "document_id": document.id,
+                        "document_title": document.title,
+                        "section_heading": chunk.chunk_metadata.get("heading", ""),
+                        "chunk_index": chunk.chunk_index,
+                    },
+                    "metadata": chunk.chunk_metadata,
+                }
+            )
 
         logger.info("Retrieved chunks", result_count=len(retrieved))
         return retrieved

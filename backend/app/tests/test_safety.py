@@ -4,7 +4,7 @@ from app.safety.classifier import SafetyClassifier
 from app.safety.policy import SafetyOutcome, ViolationType
 
 
-def test_crisis_detection():
+def test_crisis_detection() -> None:
     """Test crisis detection."""
     classifier = SafetyClassifier()
 
@@ -23,7 +23,7 @@ def test_crisis_detection():
         assert result.severity == "high"
 
 
-def test_medical_advice_detection():
+def test_medical_advice_detection() -> None:
     """Test medical advice detection."""
     classifier = SafetyClassifier()
 
@@ -39,7 +39,7 @@ def test_medical_advice_detection():
         assert result.violation_type == ViolationType.MEDICAL_ADVICE
 
 
-def test_safe_message():
+def test_safe_message() -> None:
     """Test safe message."""
     classifier = SafetyClassifier()
 
@@ -54,7 +54,7 @@ def test_safe_message():
         assert result.outcome == SafetyOutcome.OK
 
 
-def test_response_grounding():
+def test_response_grounding() -> None:
     """Test response grounding check."""
     classifier = SafetyClassifier()
 
@@ -75,7 +75,7 @@ def test_response_grounding():
     assert result.outcome == SafetyOutcome.REFUSED
 
 
-def test_response_length_check():
+def test_response_length_check() -> None:
     """Test response length vs context."""
     classifier = SafetyClassifier()
 

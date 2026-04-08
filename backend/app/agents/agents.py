@@ -147,7 +147,9 @@ If you're unsure or the information isn't in the context, ask for clarification.
                 "document_title": chunk["citation"]["document_title"],
                 "section_heading": chunk["citation"].get("section_heading", ""),
                 "chunk_index": chunk["citation"]["chunk_index"],
-                "text_snippet": chunk["text"][:200] + "..." if len(chunk["text"]) > 200 else chunk["text"],
+                "text_snippet": chunk["text"][:200] + "..."
+                if len(chunk["text"]) > 200
+                else chunk["text"],
             }
             for chunk in chunks
         ]
@@ -243,7 +245,9 @@ class FinalizerAgent:
                 "citations": [],
                 "safety_outcome": safety_result.outcome.value,
                 "safety_reason": safety_result.reason,
-                "violation_type": safety_result.violation_type.value if safety_result.violation_type else None,
+                "violation_type": safety_result.violation_type.value
+                if safety_result.violation_type
+                else None,
                 "severity": safety_result.severity,
                 "confidence": safety_result.confidence,
             }
@@ -260,7 +264,9 @@ class FinalizerAgent:
                 "citations": [],
                 "safety_outcome": safety_result.outcome.value,
                 "safety_reason": safety_result.reason,
-                "violation_type": safety_result.violation_type.value if safety_result.violation_type else None,
+                "violation_type": safety_result.violation_type.value
+                if safety_result.violation_type
+                else None,
                 "severity": safety_result.severity,
                 "confidence": safety_result.confidence,
             }

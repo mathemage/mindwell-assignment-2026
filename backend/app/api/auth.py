@@ -34,7 +34,7 @@ def create_access_token(user_id: str) -> str:
         "sub": user_id,
         "exp": expire,
     }
-    return jwt.encode(to_encode, settings.secret_key, algorithm="HS256")
+    return str(jwt.encode(to_encode, settings.secret_key, algorithm="HS256"))
 
 
 def decode_access_token(token: str) -> str:

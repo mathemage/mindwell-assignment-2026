@@ -4,6 +4,7 @@ import io
 
 import pytest
 from pypdf import PdfWriter
+from sqlalchemy.orm import Session
 
 from app.core.errors import DocumentProcessingError
 from app.llm.openai_provider import OpenAIProvider
@@ -13,7 +14,7 @@ from app.services.document_service import DocumentService
 
 
 @pytest.fixture
-def document_service(test_db):
+def document_service(test_db: Session) -> DocumentService:
     """Create document service for testing."""
     llm_provider = OpenAIProvider()
     chunker = TextChunker()
@@ -22,7 +23,10 @@ def document_service(test_db):
 
 
 @pytest.mark.asyncio
-async def test_pdf_with_no_text(test_db, document_service):
+async def test_pdf_with_no_text(
+    test_db: Session,
+    document_service: DocumentService,
+) -> None:
     """Test PDF with no extractable text raises error."""
     # Create a blank PDF (no text)
     pdf_writer = PdfWriter()
@@ -36,5 +40,5 @@ async def test_pdf_with_no_text(test_db, document_service):
         await document_service.ingest_file(
             test_db,
             "blank.pdf",
-            pdf_bytes.getvalue()
+            pdf_bytes.getvalue(),
         )
