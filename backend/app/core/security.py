@@ -8,12 +8,10 @@ from app.core.config import get_settings
 settings = get_settings()
 
 # PII detection patterns
-EMAIL_PATTERN = re.compile(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b')
-PHONE_PATTERN = re.compile(
-    r'\b(?:\+?1[-.]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b'
-)
-SSN_PATTERN = re.compile(r'\b\d{3}-\d{2}-\d{4}\b')
-CREDIT_CARD_PATTERN = re.compile(r'\b\d{4}[-\s]?\d{4}[-\s]?\d{4}[-\s]?\d{4}\b')
+EMAIL_PATTERN = re.compile(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b")
+PHONE_PATTERN = re.compile(r"\b(?:\+?1[-.]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b")
+SSN_PATTERN = re.compile(r"\b\d{3}-\d{2}-\d{4}\b")
+CREDIT_CARD_PATTERN = re.compile(r"\b\d{4}[-\s]?\d{4}[-\s]?\d{4}[-\s]?\d{4}\b")
 
 
 def detect_pii(text: str) -> dict[str, list[str]]:
@@ -88,17 +86,14 @@ def sanitize_log_data(data: dict[str, Any]) -> dict[str, Any]:
     if not settings.redact_pii:
         return data
 
-    sanitized = {}
+    sanitized: dict[str, Any] = {}
     for key, value in data.items():
         if isinstance(value, str):
             sanitized[key] = redact_pii(value)
         elif isinstance(value, dict):
             sanitized[key] = sanitize_log_data(value)
         elif isinstance(value, list):
-            sanitized[key] = [
-                redact_pii(item) if isinstance(item, str) else item
-                for item in value
-            ]
+            sanitized[key] = [redact_pii(item) if isinstance(item, str) else item for item in value]
         else:
             sanitized[key] = value
 

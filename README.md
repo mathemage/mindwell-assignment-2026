@@ -99,6 +99,8 @@ make typecheck
 make test
 ```
 
+> **CI note:** GitHub Actions runs backend `ruff`, `mypy`, and `pytest` jobs when a change touches `backend/**` or `.github/workflows/ci.yml`. Docs-only PRs skip those backend jobs so CI stays focused on the files that changed.
+
 ## API Usage
 
 ### 1. Login (Dev Mode)

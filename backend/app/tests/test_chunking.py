@@ -6,12 +6,12 @@ from app.rag.chunking import TextChunker
 
 
 @pytest.fixture
-def chunker():
+def chunker() -> TextChunker:
     """Create a text chunker without tiktoken dependency."""
     return TextChunker(chunk_size=100, chunk_overlap=20)
 
 
-def test_chunk_markdown(chunker):
+def test_chunk_markdown(chunker: TextChunker) -> None:
     """Test markdown chunking."""
 
     text = """# Main Heading
@@ -39,7 +39,7 @@ More content here.
     assert any(h != "" for h in headings)
 
 
-def test_chunk_text(chunker):
+def test_chunk_text(chunker: TextChunker) -> None:
     """Test plain text chunking."""
 
     text = "This is a test sentence. " * 20  # Long text
@@ -51,7 +51,7 @@ def test_chunk_text(chunker):
     assert all("metadata" in chunk for chunk in chunks)
 
 
-def test_chunk_overlap(chunker):
+def test_chunk_overlap(chunker: TextChunker) -> None:
     """Test chunk overlap."""
 
     text = "A" * 250  # Long text

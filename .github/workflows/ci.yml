@@ -21,9 +21,12 @@ jobs:
       - uses: dorny/paths-filter@v3
         id: filter
         with:
+          # Backend quality gates run when backend files or this workflow change.
+          # Docs-only changes can skip backend jobs without hiding CI config issues.
           filters: |
             backend:
               - 'backend/**'
+              - '.github/workflows/ci.yml'
 
   lint:
     needs: changes

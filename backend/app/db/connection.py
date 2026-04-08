@@ -4,7 +4,7 @@ from collections.abc import Generator
 from contextlib import contextmanager
 
 from sqlalchemy import create_engine
-from sqlalchemy.orm import Session, declarative_base, sessionmaker
+from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 from app.core.config import get_settings
 from app.core.logging import get_logger
@@ -24,8 +24,10 @@ engine = create_engine(
 # Create session factory
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
+
 # Create base class for models
-Base = declarative_base()
+class Base(DeclarativeBase):
+    """Base class for ORM models."""
 
 
 def get_db() -> Generator[Session, None, None]:

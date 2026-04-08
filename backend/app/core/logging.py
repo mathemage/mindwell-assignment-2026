@@ -2,16 +2,22 @@
 
 import logging
 import sys
-from typing import Any
+from collections.abc import Mapping, MutableMapping
+from typing import Any, cast
 
 import structlog
+from structlog.typing import Processor
 
 from app.core.config import get_settings
 
 settings = get_settings()
 
 
-def sanitize_event_dict(logger: Any, method_name: str, event_dict: dict[str, Any]) -> dict[str, Any]:
+def sanitize_event_dict(
+    logger: Any,
+    method_name: str,
+    event_dict: MutableMapping[str, Any],
+) -> Mapping[str, Any]:
     """
     Sanitize event dict to redact PII before logging.
 
@@ -21,12 +27,14 @@ def sanitize_event_dict(logger: Any, method_name: str, event_dict: dict[str, Any
     # Import here to avoid circular dependency
     from app.core.security import redact_pii
 
-    sanitized = {}
+    sanitized: dict[str, Any] = {}
     for key, value in event_dict.items():
         if isinstance(value, str):
             sanitized[key] = redact_pii(value)
         elif isinstance(value, dict):
-            sanitized[key] = {k: redact_pii(v) if isinstance(v, str) else v for k, v in value.items()}
+            sanitized[key] = {
+                k: redact_pii(v) if isinstance(v, str) else v for k, v in value.items()
+            }
         else:
             sanitized[key] = value
 
@@ -36,21 +44,27 @@ def sanitize_event_dict(logger: Any, method_name: str, event_dict: dict[str, Any
 def setup_logging() -> None:
     """Configure structured logging."""
     # Configure structlog
+    renderer = cast(
+        Processor,
+        structlog.processors.JSONRenderer()
+        if not settings.is_development
+        else structlog.dev.ConsoleRenderer(),
+    )
+    processors: list[Processor] = [
+        structlog.contextvars.merge_contextvars,
+        structlog.stdlib.filter_by_level,
+        structlog.processors.TimeStamper(fmt="iso"),
+        structlog.stdlib.add_logger_name,
+        structlog.stdlib.add_log_level,
+        structlog.stdlib.PositionalArgumentsFormatter(),
+        structlog.processors.StackInfoRenderer(),
+        structlog.processors.format_exc_info,
+        structlog.processors.UnicodeDecoder(),
+        sanitize_event_dict,  # Add PII sanitization processor
+        renderer,
+    ]
     structlog.configure(
-        processors=[
-            structlog.contextvars.merge_contextvars,
-            structlog.stdlib.filter_by_level,
-            structlog.processors.TimeStamper(fmt="iso"),
-            structlog.stdlib.add_logger_name,
-            structlog.stdlib.add_log_level,
-            structlog.stdlib.PositionalArgumentsFormatter(),
-            structlog.processors.StackInfoRenderer(),
-            structlog.processors.format_exc_info,
-            structlog.processors.UnicodeDecoder(),
-            sanitize_event_dict,  # Add PII sanitization processor
-            structlog.processors.JSONRenderer() if not settings.is_development
-            else structlog.dev.ConsoleRenderer(),
-        ],
+        processors=processors,
         wrapper_class=structlog.stdlib.BoundLogger,
         context_class=dict,
         logger_factory=structlog.stdlib.LoggerFactory(),
@@ -82,7 +96,7 @@ def redact_sensitive_data(data: dict[str, Any]) -> dict[str, Any]:
         "session",
     }
 
-    redacted = {}
+    redacted: dict[str, Any] = {}
     for key, value in data.items():
         if any(sensitive in key.lower() for sensitive in sensitive_keys):
             redacted[key] = "***REDACTED***"

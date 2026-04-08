@@ -16,9 +16,7 @@ class User(Base):
 
     __tablename__ = "users"
 
-    id: Mapped[str] = mapped_column(
-        String, primary_key=True, default=lambda: str(uuid.uuid4())
-    )
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     email: Mapped[str] = mapped_column(String, unique=True, index=True)
     hashed_password: Mapped[str | None] = mapped_column(String, nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
@@ -42,9 +40,7 @@ class Document(Base):
 
     __tablename__ = "documents"
 
-    id: Mapped[str] = mapped_column(
-        String, primary_key=True, default=lambda: str(uuid.uuid4())
-    )
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     title: Mapped[str] = mapped_column(String, index=True)
     source_type: Mapped[str] = mapped_column(String)  # markdown, pdf, etc.
     content: Mapped[str] = mapped_column(Text)
@@ -65,9 +61,7 @@ class Chunk(Base):
 
     __tablename__ = "chunks"
 
-    id: Mapped[str] = mapped_column(
-        String, primary_key=True, default=lambda: str(uuid.uuid4())
-    )
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     document_id: Mapped[str] = mapped_column(String, ForeignKey("documents.id"), index=True)
     chunk_index: Mapped[int] = mapped_column(Integer)
     text: Mapped[str] = mapped_column(Text)
@@ -86,9 +80,7 @@ class Embedding(Base):
 
     __tablename__ = "embeddings"
 
-    id: Mapped[str] = mapped_column(
-        String, primary_key=True, default=lambda: str(uuid.uuid4())
-    )
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     chunk_id: Mapped[str] = mapped_column(String, ForeignKey("chunks.id"), unique=True, index=True)
     vector: Mapped[Any] = mapped_column(Vector(1536))  # OpenAI embedding dimension
     model_name: Mapped[str] = mapped_column(String)
@@ -103,9 +95,7 @@ class Conversation(Base):
 
     __tablename__ = "conversations"
 
-    id: Mapped[str] = mapped_column(
-        String, primary_key=True, default=lambda: str(uuid.uuid4())
-    )
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     user_id: Mapped[str] = mapped_column(String, ForeignKey("users.id"), index=True)
     title: Mapped[str] = mapped_column(String, default="New Conversation")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
@@ -125,12 +115,8 @@ class Message(Base):
 
     __tablename__ = "messages"
 
-    id: Mapped[str] = mapped_column(
-        String, primary_key=True, default=lambda: str(uuid.uuid4())
-    )
-    conversation_id: Mapped[str] = mapped_column(
-        String, ForeignKey("conversations.id"), index=True
-    )
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    conversation_id: Mapped[str] = mapped_column(String, ForeignKey("conversations.id"), index=True)
     role: Mapped[str] = mapped_column(String)  # user, assistant, system
     content: Mapped[str] = mapped_column(Text)
     message_metadata: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
@@ -148,10 +134,10 @@ class SafetyCheck(Base):
 
     __tablename__ = "safety_checks"
 
-    id: Mapped[str] = mapped_column(
-        String, primary_key=True, default=lambda: str(uuid.uuid4())
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    message_id: Mapped[str] = mapped_column(
+        String, ForeignKey("messages.id"), unique=True, index=True
     )
-    message_id: Mapped[str] = mapped_column(String, ForeignKey("messages.id"), unique=True, index=True)
     outcome: Mapped[str] = mapped_column(String)  # ok, refused, escalated
     violation_type: Mapped[str | None] = mapped_column(String, nullable=True)
     severity: Mapped[str | None] = mapped_column(String, nullable=True)
